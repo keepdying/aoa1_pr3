@@ -10,12 +10,13 @@
 struct RBTreeNode {
     int key;
     bool color;
-    std::string metadata;
+    std::string metaData;
+    int timeToLive;
     RBTreeNode *left;
     RBTreeNode *right;
     RBTreeNode *parent;
 
-    RBTreeNode(int k);
+    RBTreeNode(int k, std::string metadata, int timeToLive);
 };
 
 /**
@@ -24,12 +25,13 @@ struct RBTreeNode {
  */
 class RBTree {
     public:
-    void Insert(int key);
-    void Delete(int key);
+    void Insert(int key, std::string metadata, int timetolive);
+    void Delete(RBTreeNode *node);
+    RBTreeNode* GetRoot();
     RBTreeNode* Search(int key);
+    RBTreeNode* Minimum(RBTreeNode *node);
 
     private:
-
     RBTreeNode *root_;
     void InsertFixup(RBTreeNode *node);
     void DeleteFixup(RBTreeNode *node);
@@ -39,12 +41,10 @@ class RBTree {
 
     void Transplant(RBTreeNode *u, RBTreeNode *v);
 
-    RBTreeNode* Minimum(RBTreeNode *node);
     RBTreeNode* Maximum(RBTreeNode *node);
 
-    RBTreeNode* Successor(RBTreeNode *node);
-    RBTreeNode* Predecessor(RBTreeNode *node);
-    
+    // RBTreeNode* Successor(RBTreeNode *node);
+    // RBTreeNode* Predecessor(RBTreeNode *node);
 };
 
 #endif

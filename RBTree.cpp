@@ -16,12 +16,12 @@
  * 
  * @param k value to hold.
  */
-RBTreeNode::RBTreeNode(int k){
+RBTreeNode::RBTreeNode(int k, std::string metadata, int timetolive){
     key = k;
-    color = true; /**
-     * @brief Bool value to hold color data. True for Red, else for Black. 
-     * 
-     */
+    color = true; // Bool value to keep color data. True for Red, False for Black.
+    metaData = metadata;
+    timeToLive = timetolive;
+
     left = nullptr;
     right = nullptr;
     parent = nullptr;
@@ -40,9 +40,9 @@ RBTree::RBTree(){
  * 
  * @param key value to hold in new node.
  */
-void RBTree::Insert(int key){
+void RBTree::Insert(int key, std::string metadata, int timetolive){
     // Create the new node
-    RBTreeNode *node = new RBTreeNode(key);
+    RBTreeNode *node = new RBTreeNode(key, metadata, timetolive);
 
     // Find the correct position for the new node
     RBTreeNode *y = nullptr;
@@ -96,7 +96,12 @@ RBTreeNode* RBTree::Maximum(RBTreeNode *node) {
     }
     return node;
 }
-
+/**
+ * @brief Helper function for DeleteFixup
+ * Implementation of Psuedocode from CLRS
+ * @param u node - 1
+ * @param v node - 2
+ */
 void RBTree::Transplant(RBTreeNode *u, RBTreeNode *v) {
     if (u->parent == nullptr) {
         root_ = v;
@@ -115,15 +120,18 @@ void RBTree::Transplant(RBTreeNode *u, RBTreeNode *v) {
  * 
  * @param key value to match node.
  */
-void RBTree::Delete(int key) {
-    RBTreeNode *node = Search(key);
-    if (node == nullptr) return;  // Node with the given key not found
+void RBTree::Delete(RBTreeNode *node) {
+    // RBTreeNode *node = Search(key);
+    // if (node == nullptr) return;  // Node with the given key not found
 
     RBTreeNode *y = node;
     RBTreeNode *x = nullptr;
 
     bool y_original_color = y->color;
-
+    /**
+     * @brief Implementation of Psuedocode from CLRS book.
+     * 
+     */
     if (node->left == nullptr) {
         x = node->right;
         Transplant(node, node->right);
@@ -220,6 +228,53 @@ void RBTree::DeleteFixup(RBTreeNode *node) {
     node->color = false;
 }
 
+void RBTree::InsertFixup(RBTreeNode *node) {
+    // Fix violations of the red-black tree properties
+    while (node != root_ && node->parent->color == true) {
+        RBTreeNode *uncle = nullptr;
+        if (node->parent == node->parent->parent->left) {
+            uncle = node->parent->parent->right;
+            if (uncle != nullptr && uncle->color == true) {
+                // Case 1: uncle is red
+                node->parent->color = false;
+                uncle->color = false;
+                node->parent->parent->color = true;
+                node = node->parent->parent;
+            } else {
+                if (node == node->parent->right) {
+                // Case 2: uncle is black, node is a right child
+                node = node->parent;
+                RotateLeft(node);
+                }
+                // Case 3: uncle is black, node is a left child
+                node->parent->color = false;
+                node->parent->parent->color = true;
+                RotateRight(node->parent->parent);
+            }
+        } else {
+            uncle = node->parent->parent->left;
+            if (uncle != nullptr && uncle->color == true) {
+                // Case 1: uncle is red
+                node->parent->color = false;
+                uncle->color = false;
+                node->parent->parent->color = true;
+                node = node->parent->parent;
+            } else {
+                if (node == node->parent->left) {
+                // Case 2: uncle is black, node is a left child
+                node = node->parent;
+                RotateRight(node);
+                }
+                // Case 3: uncle is black, node is a right child
+                node->parent->color = false;
+                node->parent->parent->color = true;
+                RotateLeft(node->parent->parent);
+            }
+        }
+    }
+    root_->color = false;  // The root should always be black
+}
+
 /**
  * @brief Search given key value through RBTree.
  * 
@@ -239,7 +294,52 @@ RBTreeNode* RBTree::Search(int key) {
     }
   return nullptr;  // Node with the given key not found
 }
-
-void RBTree::RotateLeft(RBTreeNode *node){
+/**
+ * @brief Rotate RBTree of given root node to left.
+ * 
+ * @param node to rotate sub-tree.
+ */
+void RBTree::RotateLeft(RBTreeNode *node) {
     RBTreeNode *y = node->right;
+    node->right = y->left;
+    if (y->left != nullptr) {
+        y->left->parent = node;
+    }
+    y->parent = node->parent;
+    if (node->parent == nullptr) {
+        root_ = y;
+    } else if (node == node->parent->left) {
+        node->parent->left = y;
+    } else {
+        node->parent->right = y;
+    }
+    y->left = node;
+    node->parent = y;
+}
+
+/**
+ * @brief Rotate RBTree of given root node to right.
+ * 
+ * @param node to rotate sub-tree.
+ */
+void RBTree::RotateRight(RBTreeNode *node) {
+    RBTreeNode *y = node->left;
+    node->left = y->right;
+    if (y->right != nullptr) {
+        y->right->parent = node;
+    }
+    y->parent = node->parent;
+    if (node->parent == nullptr) {
+        root_ = y;
+    } else if (node == node->parent->right) {
+        node->parent->right = y;
+    } else {
+        node->parent->left = y;
+    }
+    y->right = node;
+    node->parent = y;
+}
+
+RBTreeNode* RBTree::GetRoot(){
+    return RBTree::root_;
 }
