@@ -1,2 +1,2 @@
 all:
-	g++ CFS.cpp -o homework3
+	g++ CFS.cpp RBTree.cpp -o homework3

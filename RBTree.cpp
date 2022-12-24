@@ -10,21 +10,22 @@
  */
 
 #include "RBTree.h"
+#include <iostream>
 
 /**
  * @brief Constructor of RBTreeNode struct.
  * 
  * @param k value to hold.
  */
-RBTreeNode::RBTreeNode(int k, std::string metadata, int timetolive){
-    key = k;
-    color = true; // Bool value to keep color data. True for Red, False for Black.
-    metaData = metadata;
-    timeToLive = timetolive;
+RBTreeNode::RBTreeNode(int k, std::string Metadata, int BurstTime){
+    this->key = k;
+    this->color = true; // Bool value to keep color data. True for Red, False for Black.
+    this->Metadata = Metadata;
+    this->BurstTime = BurstTime;
 
-    left = nullptr;
-    right = nullptr;
-    parent = nullptr;
+    this->left = nullptr;
+    this->right = nullptr;
+    this->parent = nullptr;
 }
 
 /**
@@ -32,7 +33,7 @@ RBTreeNode::RBTreeNode(int k, std::string metadata, int timetolive){
  * 
  */
 RBTree::RBTree(){
-    root_ = nullptr;
+    this->root_ = nullptr;
 }
 
 /**
@@ -40,9 +41,9 @@ RBTree::RBTree(){
  * 
  * @param key value to hold in new node.
  */
-void RBTree::Insert(int key, std::string metadata, int timetolive){
+void RBTree::Insert(int key, std::string metadata, int BurstTime){
     // Create the new node
-    RBTreeNode *node = new RBTreeNode(key, metadata, timetolive);
+    RBTreeNode *node = new RBTreeNode(key, metadata, BurstTime);
 
     // Find the correct position for the new node
     RBTreeNode *y = nullptr;
@@ -121,8 +122,11 @@ void RBTree::Transplant(RBTreeNode *u, RBTreeNode *v) {
  * @param key value to match node.
  */
 void RBTree::Delete(RBTreeNode *node) {
-    // RBTreeNode *node = Search(key);
-    // if (node == nullptr) return;  // Node with the given key not found
+
+    if (node->parent == nullptr && node->left == nullptr && node->right == nullptr){ // Check if its only node in tree
+        root_ = nullptr;
+        return;  // Node with the given key not found
+    } 
 
     RBTreeNode *y = node;
     RBTreeNode *x = nullptr;
@@ -154,10 +158,10 @@ void RBTree::Delete(RBTreeNode *node) {
         y->left->parent = y;
         y->color = node->color;
     }
-
+    
     if (y_original_color == false) {
-        DeleteFixup(x);
-  }
+            DeleteFixup(x);
+    }
 }
 
 /**
@@ -342,4 +346,11 @@ void RBTree::RotateRight(RBTreeNode *node) {
 
 RBTreeNode* RBTree::GetRoot(){
     return RBTree::root_;
+}
+
+void RBTree::PrintInOrder(std::ostream &os, RBTreeNode *node) {
+    if (node == nullptr) return;
+    PrintInOrder(os, node->left);
+    os << node->Metadata << ":" << node->key << "-" << (node->color ? "Red" : "Black") << (node == this->root_ ? "," : ";");
+    PrintInOrder(os, node->right);
 }

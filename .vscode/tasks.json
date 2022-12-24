@@ -8,6 +8,7 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "${file}",
+                "${workspaceFolder}/RBTree.cpp",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"
             ],

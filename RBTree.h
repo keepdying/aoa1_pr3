@@ -2,6 +2,8 @@
 #define RBTree_H
 
 #include <string>
+#include <iostream>
+#include <fstream>
 
 /**
  * @brief RBTreeNode struct template.
@@ -10,13 +12,13 @@
 struct RBTreeNode {
     int key;
     bool color;
-    std::string metaData;
-    int timeToLive;
+    std::string Metadata;
+    int BurstTime;
     RBTreeNode *left;
     RBTreeNode *right;
     RBTreeNode *parent;
 
-    RBTreeNode(int k, std::string metadata, int timeToLive);
+    RBTreeNode(int k, std::string metadata, int BurstTime);
 };
 
 /**
@@ -25,11 +27,13 @@ struct RBTreeNode {
  */
 class RBTree {
     public:
-    void Insert(int key, std::string metadata, int timetolive);
+    void Insert(int key, std::string metadata, int BurstTime);
     void Delete(RBTreeNode *node);
     RBTreeNode* GetRoot();
     RBTreeNode* Search(int key);
     RBTreeNode* Minimum(RBTreeNode *node);
+    void PrintInOrder(std::ostream &os, RBTreeNode *node);
+    RBTree();
 
     private:
     RBTreeNode *root_;
@@ -43,8 +47,6 @@ class RBTree {
 
     RBTreeNode* Maximum(RBTreeNode *node);
 
-    // RBTreeNode* Successor(RBTreeNode *node);
-    // RBTreeNode* Predecessor(RBTreeNode *node);
 };
 
 #endif
