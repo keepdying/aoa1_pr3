@@ -26,6 +26,13 @@ class CFS_Sched{
         if (min == nullptr){
             return;
         }
+        
+        if (min->parent != nullptr){
+            if (min->key + 1 == min->parent->key){
+                min->key += 1;
+                return;
+            }
+        }
 
         RBTree_.Delete(min);
         min->key += 1;
@@ -70,6 +77,7 @@ class CFS_Sched{
     void Start(ostream &os, vector<Process> &ProcessList){
         chrono::time_point<chrono::high_resolution_clock> start, end; // define start and end times.
 	    start = chrono::high_resolution_clock::now();
+        int process_count = ProcessList.size();
 
         for (int& i = this->currRuntime; i < this->maxRuntime; i++){
             for (int j = 0; j < ProcessList.size(); j++){
@@ -81,7 +89,7 @@ class CFS_Sched{
             }
             os << i << ",";
             if (RBTree_.GetRoot() == nullptr){
-                os << "-,-,-,-" << "\n";
+                os << "-,-,-,-,-" << "\n";
             } else {
                 os << this->RunningTask() << "," << this->TaskVruntime() << "," << this->Min() << ",";
                 this->PrintInOrder(os);
@@ -93,7 +101,7 @@ class CFS_Sched{
         end = chrono::high_resolution_clock::now();
 	    chrono::duration<double> elapsed_seconds = end - start;
         os << "Scheduling finished in " << elapsed_seconds.count() * 1000 << "ms." << "\n";
-        os << this->FinishedProcesses.size() << " of " << ProcessList.size() << " processes are completed." << "\n";
+        os << this->FinishedProcesses.size() << " of " << process_count << " processes are completed." << "\n";
         os << "The order of completion of the tasks: ";
         for (int k = 0; k < this->FinishedProcesses.size(); k++){
             os << this->FinishedProcesses[k].Metadata << (k + 1 == this->FinishedProcesses.size() ? "\n" : "-");
@@ -108,8 +116,8 @@ class CFS_Sched{
 };
 
 int main(int argc, char* argv[]){
-    // string filename = argv[1];
-	string filename = "./input_2.txt";
+    string filename = argv[1];
+	// string filename = "./input_2.txt";
     string outname = regex_replace(filename, regex("input"), "output");
     
     CFS_Sched CFS_Sched_;
@@ -143,7 +151,7 @@ int main(int argc, char* argv[]){
     }
     file.close();
     
-    CFS_Sched_.Start(cout, ProcessList);
+    CFS_Sched_.Start(ofile, ProcessList);
     ofile.close();
 
     return 0;

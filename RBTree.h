@@ -32,6 +32,7 @@ class RBTree {
     RBTreeNode* GetRoot();
     RBTreeNode* Search(int key);
     RBTreeNode* Minimum(RBTreeNode *node);
+    RBTreeNode* Maximum(RBTreeNode *node);
     void PrintInOrder(std::ostream &os, RBTreeNode *node);
     RBTree();
 
@@ -39,14 +40,10 @@ class RBTree {
     RBTreeNode *root_;
     void InsertFixup(RBTreeNode *node);
     void DeleteFixup(RBTreeNode *node);
+    void Transplant(RBTreeNode *u, RBTreeNode *v);
 
     void RotateLeft(RBTreeNode *node);
     void RotateRight(RBTreeNode *node);
-
-    void Transplant(RBTreeNode *u, RBTreeNode *v);
-
-    RBTreeNode* Maximum(RBTreeNode *node);
-
 };
 
 #endif

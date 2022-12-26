@@ -117,7 +117,7 @@ void RBTree::Transplant(RBTreeNode *u, RBTreeNode *v) {
 }
 
 /**
- * @brief Delete the first node with given key.
+ * @brief Delete the given node from tree.
  * 
  * @param key value to match node.
  */
@@ -146,12 +146,12 @@ void RBTree::Delete(RBTreeNode *node) {
         y = Minimum(node->right);
         y_original_color = y->color;
         x = y->right;
-        if (y->parent == node) {
-            x->parent = y;
-        } else {
+        if (y != node->right) {
             Transplant(y, y->right);
             y->right = node->right;
             y->right->parent = y;
+        } else {
+            x->parent = y;
         }
         Transplant(node, y);
         y->left = node->left;
@@ -173,32 +173,32 @@ void RBTree::DeleteFixup(RBTreeNode *node) {
     while (node != root_ && node->color == false) {
         if (node == node->parent->left) {
             RBTreeNode *w = node->parent->right;
-        if (w->color == true) {
-            // Case 1: w is red
-            w->color = false;
-            node->parent->color = true;
-            RotateLeft(node->parent);
-            w = node->parent->right;
-        }
-        if (w->left->color == false && w->right->color == false) {
-            // Case 2: w is black and both of its children are black
-            w->color = true;
-            node = node->parent;
-        } else {
-            if (w->right->color == false) {
-                // Case 3: w is black, w->left is red, and w->right is black
-                w->left->color = false;
-                w->color = true;
-                RotateRight(w);
+            if (w->color == true) {
+                // Case 1: w is red
+                w->color = false;
+                node->parent->color = true;
+                RotateLeft(node->parent);
                 w = node->parent->right;
             }
-            // Case 4: w is black and w->right is red
-            w->color = node->parent->color;
-            node->parent->color = false;
-            w->right->color = false;
-            RotateLeft(node->parent);
-            node = root_;
-            }
+            if (w->left->color == false && w->right->color == false) {
+                // Case 2: w is black and both of its children are black
+                w->color = true;
+                node = node->parent;
+            } else {
+                if (w->right->color == false) {
+                    // Case 3: w is black, w->left is red, and w->right is black
+                    w->left->color = false;
+                    w->color = true;
+                    RotateRight(w);
+                    w = node->parent->right;
+                }
+                // Case 4: w is black and w->right is red
+                w->color = node->parent->color;
+                node->parent->color = false;
+                w->right->color = false;
+                RotateLeft(node->parent);
+                node = root_;
+                }
         } else {
             RBTreeNode *w = node->parent->left;
             if (w->color == true) {
